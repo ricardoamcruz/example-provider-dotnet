@@ -27,6 +27,7 @@ jobs:
       - name: Test
         run: GIT_BRANCH=${GITHUB_REF:11} make run_tests
         env:
+          PACTICIPANT: ${{ matrix.pact_consumer }}
           PACT_PROVIDER: ${{ matrix.pact_provider }}
 
   # Runs on branches as well, so we know the status of our PRs
@@ -49,3 +50,5 @@ jobs:
       - name: Deploy
         run: GIT_BRANCH=${GITHUB_REF:11} make deploy
         if: github.ref == 'refs/heads/main'
+        env:
+          PACTICIPANT: ${{ matrix.pact_provider }}
