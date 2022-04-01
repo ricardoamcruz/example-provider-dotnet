@@ -24,6 +24,11 @@ jobs:
         uses: actions/setup-dotnet@v1.7.2
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Publish pacts for ${{ matrix.pact_provider }}
+        run: GIT_BRANCH=${GITHUB_REF:11} make publish_pacts
+        env:
+          PACTICIPANT: ${{ matrix.pact_consumer }}
+          PACT_PROVIDER: ${{ matrix.pact_provider }}
       - name: Test
         run: GIT_BRANCH=${GITHUB_REF:11} make run_tests
         env:
