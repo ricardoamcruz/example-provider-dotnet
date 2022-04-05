@@ -54,10 +54,6 @@ namespace tests
 
             IPactVerifier pactVerifier = new PactVerifier(config);
             string pactUrl = System.Environment.GetEnvironmentVariable("PACT_URL");
-            pactVerifier
-                .ProviderState($"{_pactServiceUri}/provider-states")
-                .ServiceProvider("pactflow-example-provider-dotnet", _providerUri)
-                .HonoursPactWith("pactflow-example-provider-dotnet");
 
             //if (pactUrl != "" && pactUrl != null) {
             //    // Webhook path - verify the specific pact
@@ -69,6 +65,11 @@ namespace tests
                     uriOptions: new PactUriOptions(System.Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")),
                     consumerVersionTags: new List<string> { "master", "prod" });
             //}
+
+            pactVerifier
+                .ProviderState($"{_pactServiceUri}/provider-states")
+                .ServiceProvider("pactflow-example-provider-dotnet", _providerUri)
+                .HonoursPactWith("pactflow-example-provider-dotnet");
 
             // Act / Assert
             pactVerifier.Verify();
