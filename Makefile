@@ -2,7 +2,7 @@ PACTICIPANT := "pactflow-example-provider-dotnet"
 GITHUB_REPO := "pactflow/pactflow-example-provider-dotnet"
 PACT_CHANGED_WEBHOOK_UUID := "46ed3f10-d03f-43cd-b945-ce45ff42d324"
 TRIGGER_PROVIDER_BUILD_URL := "https://api.travis-ci.com/repo/pactflow%2Fexample-provider-dotnet/requests"
-PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest"
+PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli
 
 # Only deploy from master
 ifeq ($(GIT_BRANCH),master)
@@ -38,6 +38,7 @@ fake_ci: .env
 	CI=true \
 	GIT_COMMIT=`git rev-parse --short HEAD`+`date +%s` \
 	GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` \
+	PACT_BROKER_PUBLISH_VERIFICATION_RESULTS=true \
 	make ci
 
 ci_webhook: run_tests
@@ -55,22 +56,19 @@ run_tests: restore start test stop
 ## Deploy tasks
 ## =====================
 
-deploy: deploy_app tag_as_prod
+deploy: deploy_app record_deployment
 
 no_deploy:
 	@echo "Not deploying as not on master branch"
 
 can_i_deploy: .env
-	@"${PACT_CLI}" broker can-i-deploy --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT}
+	@"${PACT_CLI}" broker can-i-deploy --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT} --to-environment production
 
 deploy_app:
 	@echo "Deploying"
 
-tag_as_prod:
-	@"${PACT_CLI}" broker create-version-tag \
-	  --pacticipant ${PACTICIPANT} \
-	  --version ${GIT_COMMIT} \
-	  --tag prod
+record_deployment:
+	@"${PACT_CLI}" broker record_deployment --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT} --environment production
 
 ## =====================
 ## Pactflow set up tasks
