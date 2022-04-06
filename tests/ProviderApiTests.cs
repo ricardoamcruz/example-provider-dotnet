@@ -23,6 +23,13 @@ namespace tests
             _providerUri = "http://localhost:9000";
             _pactServiceUri = "http://localhost:9001";
 
+#if (DEBUG)
+            Environment.SetEnvironmentVariable("GIT_COMMIT", "97f8a6ead6bbe8b746c1af4270df1db4bfb4e844");
+            Environment.SetEnvironmentVariable("PACT_URL", "https://ricardocruz.pactflow.io/pacts/provider/pactflow-example-provider-dotnet/consumer/pactflow-example-consumer-dotnet/latest");
+            Environment.SetEnvironmentVariable("PACT_BROKER_BASE_URL", "https://ricardocruz.pactflow.io");
+            Environment.SetEnvironmentVariable("PACT_BROKER_TOKEN", "hzEalA5OGKiz9as30Dm9Mw");
+#endif
+
             _webHost = WebHost.CreateDefaultBuilder()
                 .UseUrls(_pactServiceUri)
                 .UseStartup<TestStartup>()
@@ -55,25 +62,24 @@ namespace tests
             IPactVerifier pactVerifier = new PactVerifier(config);
             string pactUrl = System.Environment.GetEnvironmentVariable("PACT_URL");
 
-            //if (pactUrl != "" && pactUrl != null) {
-            //    // Webhook path - verify the specific pact
-            //    pactVerifier.PactUri(pactUrl, new PactUriOptions(System.Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")));
+            if (pactUrl != "" && pactUrl != null) {
+                // Webhook path - verify the specific pact
+                pactVerifier.PactUri(pactUrl, new PactUriOptions(System.Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")));
                 
-            //} else {
+            } else {
                 // Standard verification path - run the
                 pactVerifier.PactBroker(System.Environment.GetEnvironmentVariable("PACT_BROKER_BASE_URL"),
                     uriOptions: new PactUriOptions(System.Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")),
                     consumerVersionTags: new List<string> { "master", "prod" });
-            //}
+            }
 
             pactVerifier
                 .ProviderState($"{_pactServiceUri}/provider-states")
                 .ServiceProvider("pactflow-example-provider-dotnet", _providerUri)
-                .HonoursPactWith("pactflow-example-provider-dotnet");
+                .HonoursPactWith("pactflow-example-consumer-dotnet");
 
             // Act / Assert
             pactVerifier.Verify();
-
         }
 
         #region IDisposable Support
