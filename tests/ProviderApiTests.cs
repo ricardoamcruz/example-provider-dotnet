@@ -23,13 +23,6 @@ namespace tests
             _providerUri = "http://localhost:9000";
             _pactServiceUri = "http://localhost:9001";
 
-#if (DEBUG)
-            Environment.SetEnvironmentVariable("GIT_COMMIT", "97f8a6ead6bbe8b746c1af4270df1db4bfb4e844");
-            Environment.SetEnvironmentVariable("PACT_URL", "https://ricardocruz.pactflow.io/pacts/provider/pactflow-example-provider-dotnet/consumer/pactflow-example-consumer-dotnet/latest");
-            Environment.SetEnvironmentVariable("PACT_BROKER_BASE_URL", "https://ricardocruz.pactflow.io");
-            Environment.SetEnvironmentVariable("PACT_BROKER_TOKEN", "hzEalA5OGKiz9as30Dm9Mw");
-#endif
-
             _webHost = WebHost.CreateDefaultBuilder()
                 .UseUrls(_pactServiceUri)
                 .UseStartup<TestStartup>()
